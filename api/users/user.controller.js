@@ -14,12 +14,12 @@ let users = [
 ]
 
 exports.index = (req, res) => {
-    console.log("index");
+    // console.log("index");
     return res.json(users);
 };
 
 exports.show = (req, res) => {
-    console.log("show");
+    // console.log("show");
     const id = parseInt(req.params.id, 10);
     if(!id){
         return res.status(400).json({err: 'Incorrect id'});
@@ -34,7 +34,7 @@ exports.show = (req, res) => {
 };
 
 exports.destroy = (req, res) => {
-    console.log("destory");
+    // console.log("destory");
     const id = parseInt(req.params.id, 10);
     if (!id) {
         return res.status(400).json({error: 'Incorrect id'});
@@ -50,7 +50,7 @@ exports.destroy = (req, res) => {
 };
 
 exports.create = (req, res) => {
-    console.log("create");
+    // console.log("create");
     const name = req.body.name || '';
 
     if(!name.length){
