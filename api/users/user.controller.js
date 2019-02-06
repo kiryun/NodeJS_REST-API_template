@@ -1,21 +1,13 @@
-let users = [
-    {
-      id: 1,
-      name: 'Hyun'
-    },
-    {
-      id: 2,
-      name: 'Alice'
-    },
-    {
-      id: 3,
-      name: 'Kelly'
-    }
-]
+const models = require('../../models');
 
 exports.index = (req, res) => {
-    // console.log("index");
-    return res.json(users);
+
+    models.User.findAll().then(function(results) {
+        res.json(results);
+    }).catch(function(err) {
+        //TODO: error handling
+        return res.status(404).json({err: 'Undefined error!'});
+    });
 };
 
 exports.show = (req, res) => {
@@ -25,12 +17,16 @@ exports.show = (req, res) => {
         return res.status(400).json({err: 'Incorrect id'});
     }
 
-    let user = users.filter(user => user.id === id)[0]
-    if (!user) {
-        return res.status(404).json({err: 'Unknown user'});
-    }
-
-    return res.json(user);
+    models.User.findOne({
+        where: {
+            id: id
+        }
+    }).then(user => {
+        if(!user){
+            return res.status(404).json({err: 'No User'});
+        }
+        return res.json(user);
+    });
 };
 
 exports.destroy = (req, res) => {
@@ -40,13 +36,11 @@ exports.destroy = (req, res) => {
         return res.status(400).json({error: 'Incorrect id'});
     }
 
-    const userIdx = users.findIndex(user => user.id === id);
-    if (userIdx === -1) {
-        return res.status(404).json({error: 'Unknown user'});
-    }
-
-    users.splice(userIdx, 1);
-    res.status(204).send();
+    models.User.destroy({
+        where: {
+            id: id
+        }
+    }).then(() => res.status(204).send());
 };
 
 exports.create = (req, res) => {
@@ -56,16 +50,28 @@ exports.create = (req, res) => {
     if(!name.length){
         return res.status(400).json({err: 'Incorrect name'});
     }
-    const id = users.reduce((maxId, user) =>{
-        return user.id > maxId ? user.id : maxId;
-    }, 0) + 1;
     
-    const newUser = {
-        id: id,
+    models.User.create({
         name: name
-    };
-
-    users.push(newUser);
-
-    return res.status(201).json(newUser);
+    }).then((user) => res.status(201).json(user));
 };
+
+exports.update = (req, res) => {
+    const newName = req.body.name || '';
+    const name = models.User.name;
+    const id = parseInt(req.params.id, 10);
+
+    if(!name.length){
+        return res.status(400).json({err: 'Incrrect name'});
+    }
+
+    models.User.update(
+        {name: newName},
+        {where: {id: id}, returning: true})
+        .then(function(result) {
+             res.json(result[1][0]);
+        }).catch(function(err) {
+             //TODO: error handling
+             return res.status(404).json({err: 'Undefined error!'});
+    });
+}
