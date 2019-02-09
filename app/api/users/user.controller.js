@@ -1,4 +1,4 @@
-const models = require('../../models');
+const models = require('../../models/models');
 
 exports.index = (req, res) => {
 
@@ -9,6 +9,7 @@ exports.index = (req, res) => {
         return res.status(404).json({err: 'Undefined error!'});
     });
 };
+
 
 exports.show = (req, res) => {
     // console.log("show");
